@@ -9,6 +9,7 @@
 	function makeHTTPRequest(p_url, p_command, p_selector, p_regex, p_callback) {
 		var returnValue = "";
 		$.ajax({
+			async: false,
 			type: "POST",
 			url: 'ajax_proxy.php',
 			contentType: "application/x-www-form-urlencoded; charset=utf-8",                                                        
@@ -38,8 +39,8 @@
 	
 	// Lit la consommation instantanée de la prise (en Watts)
 	//	target : id de l'objet HTML qui recevra le résultat
-	function getInfoW(target) {
-		makeHTTPRequest('http://'+document.params.ip.value+'/goform/SystemCommand', 
+	function getInfoW(ip, target) {
+		makeHTTPRequest('http://'+ip+'/goform/SystemCommand', 
 						'GetInfo W', 
 						'textarea', 
 						/\$..W..\s+(\d*)/, 
@@ -51,8 +52,8 @@
 	
 	// Lit l'intensité de la prise (en Ampères)
 	//	target : id de l'objet HTML qui recevra le résultat
-	function getInfoI(target) {
-		makeHTTPRequest('http://'+document.params.ip.value+'/goform/SystemCommand', 
+	function getInfoI(ip, target) {
+		makeHTTPRequest('http://'+ip+'/goform/SystemCommand', 
 						'GetInfo I', 
 						'textarea', 
 						/\$..I..\s+(\d*)/, 
@@ -64,8 +65,8 @@
 	
 	// Lit la tension de la prise (en Volts)
 	//	target : id de l'objet HTML qui recevra le résultat
-	function getInfoV(target) {
-		makeHTTPRequest('http://'+document.params.ip.value+'/goform/SystemCommand', 
+	function getInfoV(ip, target) {
+		makeHTTPRequest('http://'+ip+'/goform/SystemCommand', 
 						'GetInfo V', 
 						'textarea', 
 						/\$..V..\s+(\d*)/, 
@@ -77,8 +78,8 @@
 	
 	// Lit la consommation totale de la prise (en Watts)
 	//	target : id de l'objet HTML qui recevra le résultat
-	function getInfoE(target) {
-		makeHTTPRequest('http://'+document.params.ip.value+'/goform/SystemCommand', 
+	function getInfoE(ip, target) {
+		makeHTTPRequest('http://'+ip+'/goform/SystemCommand', 
 						'GetInfo E', 
 						'textarea', 
 						/\$..E..\s+(\d*)/, 
@@ -87,12 +88,25 @@
 						}
 		);
 	}
+	
+	// Lit l'état de la prise
+	//	target : id de l'objet HTML qui recevra le résultat : 1 = allumé, 0 = éteint
+	function getStatus(ip, target) {
+		makeHTTPRequest('http://'+ip+'/goform/SystemCommand', 
+						'GetInfo W', 
+						'textarea', 
+						/\$..W..\s+(\d*)/, 
+						function (result) {
+							$(target).html((result*0.01)>0.2);
+						}
+		);
+	}
 
 	// Allume/Eteint la prise
 	//	p_on: 1 pour allumer, 0 pour éteindre
-	function setPlugOnOff(p_on) {
+	function setPlugOnOff(ip, p_on) {
 		if (p_on!=1 && p_on!=0) p_on = 0;
-		makeHTTPRequest('http://'+document.params.ip.value+'/goform/SystemCommand', 
+		makeHTTPRequest('http://'+ip+'/goform/SystemCommand', 
 						'GpioForCrond '+p_on, 
 						null, 
 						null, 
@@ -102,8 +116,8 @@
 		);
 	}
 	
-	function getFormGreenAP(target) {
-		makeHTTPRequest('http://'+document.params.ip.value+'/adm/management-user.asp', 
+	function getFormGreenAP(ip, target) {
+		makeHTTPRequest('http://'+ip+'/adm/management-user.asp', 
 						'', 
 						null, 
 						null, 
